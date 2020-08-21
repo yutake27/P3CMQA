@@ -84,8 +84,9 @@ if __name__ == '__main__':
     parser.add_argument('--input_dir_path','-d', help='Input dir data path')
     parser.add_argument('--fasta_path', '-f', required=True, help='Reference FASTA Sequence path')
     parser.add_argument('--model_path', '-m', help='Pre-trained model path', default='../trained_model.npz')
-    parser.add_argument('--preprocess_dir', '-p', help='Input preprocess directory')   
+    parser.add_argument('--preprocess_dir', '-p', help='Input preprocess directory')
     parser.add_argument('--output_dir', '-o', help='Output directory')
+    parser.add_argument('--save_res', '-s', action='store_true', help='save score of each residue')
     args = parser.parse_args()
     model = get_model(json.load(open('./config.json', 'r'), object_hook=hinted_tuple_hook))
     load_npz(file=args.model_path, obj=model, path='updater/model:main/predictor/')
@@ -103,7 +104,7 @@ if __name__ == '__main__':
     acc20_path = (preprocess_dir/target).with_suffix('.acc20')
     # output directory
     if args.output_dir:
-        output_dir = Path(args.output_path)
+        output_dir = Path(args.output_dir)
     else:
         output_dir = Path('../data/score')/target
     output_dir.mkdir(exist_ok=True, parents=True)
@@ -134,11 +135,12 @@ if __name__ == '__main__':
                 model_array.append(model_name)
                 global_score = np.mean(predict_value)
                 global_score_array.append(global_score)
-                output_path = (output_dir/model_name).with_suffix('.txt')
-                output_score(output_path, predict_value)
+                if args.save_res:
+                    output_path = (output_dir/model_name).with_suffix('.txt')
+                    output_score(output_path, predict_value)
                 del data, resid
                 gc.collect()
         
-        df = pd.DataFrame({'Score':score_array, 'Model_name': model_array}).set_index('Model_name')
+        df = pd.DataFrame({'Score': global_score_array, 'Model_name': model_array}).set_index('Model_name')
         output_path = (output_dir/target).with_suffix('.csv')
         df.to_csv(output_path)
