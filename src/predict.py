@@ -142,5 +142,6 @@ if __name__ == '__main__':
                 gc.collect()
         
         df = pd.DataFrame({'Score': global_score_array, 'Model_name': model_array}).set_index('Model_name')
+        df = df.sort_index()
         output_path = (output_dir/target).with_suffix('.csv')
         df.to_csv(output_path)
