@@ -97,8 +97,8 @@ If you want to use a local version, please download this repository.
 data
 ├── pdb
 │   └── sample
-│   ├── sample_1.pdb
-│   └── sample_2.pdb
+│        ├── sample_1.pdb
+│        └── sample_2.pdb
 ├── fasta
 │   └── sample.fasta
 └── profile
