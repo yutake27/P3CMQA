@@ -103,110 +103,108 @@ data
 │   └── sample.fasta
 └── profile
    └── sample
-   ├── sample.pssm
-   ├── sample.ss
-   └── sample.acc20
+         ├── sample.pssm
+         ├── sample.ss
+         └── sample.acc20
 ```
 
 
 
 ## Usage
 
-1. Preprocess
+* ## Preprocess
 
-    ```bash
-    $ python preprocess.py -f ../data/fasta/sample.fasta -d path/to/uniref90/uniref90 -n num_thread
-    ```
+   ```bash
+   $ python preprocess.py -f ../data/fasta/sample.fasta -d path/to/uniref90/uniref90 -n num_thread
+   ```
 
-    Use `-f` to specify the fasta file path, `-d` to specify the uniref90 database path and `-n` to specify the number of thread to use (default=1).
+   Use `-f` to specify the fasta file path, `-d` to specify the uniref90 database path and `-n` to specify the number of thread to use (default=1).
 
-    Then You can get ```sample.pssm```,``` sample.ss``` and ```sample.acc20``` under ```data/profile/sample```.
+   Then You can get ```sample.pssm```,``` sample.ss``` and ```sample.acc20``` under ```data/profile/sample```.
 
-2. Side Chain optimization using ```Scwrl4```   (**optional**)
+* ## Side Chain optimization using `Scwrl4`   (**optional**)
 
-    ```bash
-    $ Scwrl4 -i sample_1.pdb -o sample_1.pdb
-    ```
+   ```bash
+   $ Scwrl4 -i sample_1.pdb -o sample_1.pdb
+   ```
 
-3. Prediction
+* ## Prediction
 
-    * If you want to predict **multiple** model structure for one target
+   * ### **If you want to predict multiple model structure for one target**
 
-    ```bash
-    $ python predict.py -d ../data/pdb/sample -f ../data/fasta/sample/fasta
-    ```
+      ```bash
+      $ python predict.py -d ../data/pdb/sample -f ../data/fasta/sample/fasta
+      ```
 
-    Use `-d` to specify the pdb directory path and `-f` to specify the fasta file path.
+      Use `-d` to specify the pdb directory path and `-f` to specify the fasta file path.
 
-    The results are written under ```data/score/sample``` .
-    You will get a file with the global score of all model structures and files with the scores of each residue for each model structure.
+      The results are written under ```data/score/sample``` .
+      You will get a file with the global score of all model structures and files with the scores of each residue for each model structure.
 
-    In this example, you will get `data/score/sample/sample.csv`, `data/score/sample/sample_1.txt` and `data/score/sample/sample_2.txt`.
+      In this example, you will get `data/score/sample/sample.csv`, `data/score/sample/sample_1.txt` and `data/score/sample/sample_2.txt`.
 
-   
 
-    If you have a **GPU**,
+      If you have a **GPU**,
 
-    ```bash
-    $ python predict.py -d ../data/pdb/sample -f ../data/fasta/sample.fasta -g 0
-    ```
+      ```bash
+      $ python predict.py -d ../data/pdb/sample -f ../data/fasta/sample.fasta -g 0
+      ```
 
-    Use `-g` to specify the GPU ID (negative value indicates CPU).
+      Use `-g` to specify the GPU ID (negative value indicates CPU).
 
-   
+      
 
-    If you want to **specify the output directory**, 
+      If you want to **specify the output directory**, 
 
-    ```bash
-    $ python predict.py -d ../data/pdb/sample -f ../data/fasta/sample.fasta -o path/to/dir
-    ```
+      ```bash
+      $ python predict.py -d ../data/pdb/sample -f ../data/fasta/sample.fasta -o path/to/dir
+      ```
 
-    Use `-o` to specify the directory path where you want to output the results.
+      Use `-o` to specify the directory path where you want to output the results.
 
-    The results are written in   `path/to/dir/sample.csv`,  `path/to/dir/sample_1.txt` and `path/to/dir/sample_2.txt`.
+      The results are written in   `path/to/dir/sample.csv`,  `path/to/dir/sample_1.txt` and `path/to/dir/sample_2.txt`.
 
-   
+      
 
-    If you want to **sepecify the profile directory**,
+      If you want to **sepecify the profile directory**,
 
-    ```bash
-    $ python predict.py -d ../data/pdb/sample -f ../data/fasta/sample.fasta -p path/to/profile/dir
-    ```
+      ```bash
+      $ python predict.py -d ../data/pdb/sample -f ../data/fasta/sample.fasta -p path/to/profile/dir
+      ```
 
-    Directory `path/to/profile/dir` should have `sample.pssm`, `sample.ss` and `sample.acc20`.
+      Directory `path/to/profile/dir` should have `sample.pssm`, `sample.ss` and `sample.acc20`.
 
-   
 
-    * If you want to predict **single** model structure
+   * ### **If you want to predict single model structure**
 
-    ```bash
-   $ python predict.py -i ../data/pdb/sample/samle_1.pdb -f ../data/fasta/sample.fasta
-    ```
+      ```bash
+      $ python predict.py -i ../data/pdb/sample/samle_1.pdb -f ../data/fasta/sample.fasta
+      ```
 
-    Use ```-i``` to specify the pdb file path and `-f` to specify the fasta file path.
-    The results are written in ```data/score/sample/sample_1.txt```.
+      Use ```-i``` to specify the pdb file path and `-f` to specify the fasta file path.
+      The results are written in ```data/score/sample/sample_1.txt```.
 
-   
+      
 
-    If you have a **GPU**,
-   
-    ```bash
-   $ python predict.py -i ../data/pdb/sample/sample_1.pdb -f ../data/fasta/sample.fasta -g 0
-    ```
-   
-    Use `-g` to specify the GPU ID (negative value indicates CPU).
-   
-   
-   
-    If you want to **specify the output directory**, 
-   
-    ```bash
-    $ python predict.py -i ../data/pdb/sample/samle_1.pdb -f ../data/fasta/sample.fasta -o path/to/dir
-    ```
-   
-    Use `-o` to specify the directory path where you want to output the results.
-   
-    The results are written in ```path/to/dir/sample_1.txt```
+      If you have a **GPU**,
+      
+      ```bash
+      $ python predict.py -i ../data/pdb/sample/sample_1.pdb -f ../data/fasta/sample.fasta -g 0
+      ```
+      
+      Use `-g` to specify the GPU ID (negative value indicates CPU).
+      
+      
+      
+      If you want to **specify the output directory**, 
+      
+      ```bash
+      $ python predict.py -i ../data/pdb/sample/samle_1.pdb -f ../data/fasta/sample.fasta -o path/to/dir
+      ```
+      
+      Use `-o` to specify the directory path where you want to output the results.
+      
+      The results are written in ```path/to/dir/sample_1.txt```
 
 
 
