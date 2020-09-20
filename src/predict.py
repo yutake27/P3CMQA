@@ -129,7 +129,7 @@ if __name__ == '__main__':
             except Exception as e:
                 model_array.append(model_name)
                 global_score_array.append(None)
-                print('make_voxel error:'+str(input_path))
+                print('make_voxel error:'+str(input_path), e)
             else:
                 predict_value = get_predict_value(data=data, model=model, gpu=args.gpu)
                 model_array.append(model_name)
