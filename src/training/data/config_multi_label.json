@@ -1,0 +1,45 @@
+[
+  {
+    "model" :        [
+      {"name" : "L.ConvolutionND", "parameter" : {"ndim" : 3, "in_channels" : 38, "out_channels" : 128, "ksize" : 4}},
+      {"name" : "MNL.BatchNormalization", "parameter" : {"size" : 128}},
+      {"name" : "L.PReLU", "parameter" : {}},
+      {"name" : "L.ConvolutionND", "parameter" : {"ndim" : 3, "in_channels" : 128, "out_channels" : 256, "ksize" : 4}},
+      {"name" : "MNL.BatchNormalization", "parameter" : {"size" : 256}},
+      {"name" : "L.PReLU", "parameter" : {}},
+      {
+        "name" :      "L.ConvolutionND",
+        "parameter" : {"ndim" : 3, "in_channels" : 256, "out_channels" : 256, "ksize" : 2, "stride" : 2}
+      },
+      {"name" : "MNL.BatchNormalization", "parameter" : {"size" : 256}},
+      {"name" : "L.PReLU", "parameter" : {}},
+      {"name" : "L.ConvolutionND", "parameter" : {"ndim" : 3, "in_channels" : 256, "out_channels" : 512, "ksize" : 4}},
+      {"name" : "MNL.BatchNormalization", "parameter" : {"size" : 512}},
+      {"name" : "L.PReLU", "parameter" : {}},
+      {"name" : "L.ConvolutionND", "parameter" : {"ndim" : 3, "in_channels" : 512, "out_channels" : 512, "ksize" : 3}},
+      {"name" : "MNL.BatchNormalization", "parameter" : {"size" : 512}},
+      {"name" : "L.PReLU", "parameter" : {}},
+      {
+        "name" :      "L.ConvolutionND",
+        "parameter" : {"ndim" : 3, "in_channels" : 512, "out_channels" : 1024, "ksize" : 2, "stride" : 2}
+      },
+      {"name" : "MNL.BatchNormalization", "parameter" : {"size" : 1024}},
+      {"name" : "L.PReLU", "parameter" : {}},
+      {"name" : "F.mean", "parameter" : {"axis" : {"items" : [2, 3, 4], "__tuple__" : true}, "keepdims" : 1}},
+      {"name" : "L.Linear", "parameter" : {"in_size" : null, "out_size" : 1024}},
+      {"name" : "MNL.BatchNormalization", "parameter" : {"size" : 1024}},
+      {"name" : "L.PReLU", "parameter" : {}},
+      {"name" : "L.Linear", "parameter" : {"in_size" : null, "out_size" : 256}},
+      {"name" : "MNL.BatchNormalization", "parameter" : {"size" : 256}},
+      {"name" : "L.PReLU", "parameter" : {}},
+      {"name" : "L.Linear", "parameter" : {"in_size" : null, "out_size" : 1}}
+    ], "box_width" : 28,
+    "voxel_path" :   "../../../training_data/voxel_data",
+    "label_path" :   "../../../training_data/all_score",
+    "train_data": "./data/train_data.csv",
+    "test_data" : "./data/test_data.csv",
+    "label" :        ["local_lddt"], "local_threshold" : 0.5, "global_threshold" : 0.75,
+    "protein" :      "target", "train_rate" : 0.8, "data_frac" : 0.25, "channel" : 38,
+    "class_num" : 4
+  }
+]
