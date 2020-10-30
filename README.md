@@ -256,7 +256,7 @@ data
 
 ## Training and test data
 
-You can download the training data from here [training_CASzP7-10.tar.gz](http://www.cb.cs.titech.ac.jp/p3cmqa/training_casp7-10.tar.gz) .
+You can download the training data from here [training_CASP7-10.tar.gz](http://www.cb.cs.titech.ac.jp/p3cmqa/training_casp7-10.tar.gz) .
 
 You can also download the test data from here [test_CASP11-13.tar.gz](http://www.cb.cs.titech.ac.jp/p3cmqa/test_casp11-13.tar.gz) .
 
