@@ -63,17 +63,19 @@ def get_predict_value(data, model, gpu):
     return np.array(out_list) 
 
 
-def output_score(path, predict_value):
-    print('Model name : {}'.format(path))
+def output_score(input_path, output_path, predict_value, resid, resname):
     global_score = np.mean(predict_value)
-    print('Model Quality Score : {:.5f}'.format(global_score))
-    with open(path, 'w') as f:
-        f.write('# Model name : {}'.format(path))
-        f.write('# Model Quality Score : {:.5f}'.format(global_score))
-        f.write('Resid\tResname\tScore')
+    with open(output_path, 'w') as f:
+        f.write('# Model name : {}\n'.format(input_path))
+        f.write('# Model Quality Score : {:.5f}\n'.format(global_score))
+        f.write('Resid\tResname\tScore\n')
         for i in range(len(resname)):
-            f.write('{}\t{}\t{:.5f}'.format(resid[i], resname[i], predict_value[i]))
+            f.write('{}\t{}\t{:.5f}\n'.format(resid[i], resname[i], predict_value[i]))
 
+
+def output_score_stdout(input_path, global_score):
+    print('# Model name : {}'.format(input_path))
+    print('# Model Quality Score: {:.5g}'.format(global_score))
 
 
 if __name__ == '__main__':
@@ -114,8 +116,10 @@ if __name__ == '__main__':
         input_path = args.input_path
         data, resname, resid = get_voxel_predict(input_path=input_path, fasta_path=args.fasta_path, pssm_path=pssm_path, ss_path=ss_path, acc20_path=acc20_path, buffer=28, width=1)
         predict_value = get_predict_value(data=data, model=model, gpu=args.gpu)
-        output_path = (output_dir/Path(args.input_path).stem).with_suffix('.txt')
-        output_score(output_path, predict_value)
+        global_score = np.mean(predict_value)
+        output_score_stdout(input_path, global_score)
+        output_path = (output_dir / Path(input_path).stem).with_suffix('.txt')
+        output_score(input_path, output_path, predict_value, resid, resname)
         
     elif args.input_dir_path:
         input_dir_path = Path(args.input_dir_path)
@@ -130,14 +134,17 @@ if __name__ == '__main__':
                 model_array.append(model_name)
                 global_score_array.append(None)
                 print('make_voxel error:'+str(input_path), e)
+                import traceback
+                traceback.print_exc()
             else:
                 predict_value = get_predict_value(data=data, model=model, gpu=args.gpu)
                 model_array.append(model_name)
                 global_score = np.mean(predict_value)
                 global_score_array.append(global_score)
+                output_score_stdout(input_path, global_score)
                 if args.save_res:
                     output_path = (output_dir/model_name).with_suffix('.txt')
-                    output_score(output_path, predict_value)
+                    output_score(input_path, output_path, predict_value, resid, resname)
                 del data, resid
                 gc.collect()
         
