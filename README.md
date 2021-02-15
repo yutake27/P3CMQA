@@ -80,7 +80,7 @@ If you want to use a local version, please download this repository.
     $ git clone this_repository
     ```
 
-2. Download pre-training model from [here](http://www.cb.cs.titech.ac.jp/~takei/3DCNN_MQA/trained_model.npz) and put it under P3CMQA directory.
+2. Download pre-training model from [here](http://www.cb.cs.titech.ac.jp/~takei/P3CMQA/trained_model.npz) and put it under P3CMQA directory.
 
     ```bash
     $ cd P3CMQA
