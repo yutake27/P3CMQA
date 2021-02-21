@@ -93,6 +93,8 @@ if __name__ == '__main__':
     model = get_model(json.load(open('./config.json', 'r'), object_hook=hinted_tuple_hook))
     load_npz(file=args.model_path, obj=model, path='updater/model:main/predictor/')
     if args.gpu >= 0:
+        ws_size = 512 * 1024 * 1024 # 512 MB
+        chainer.cuda.set_max_workspace_size(ws_size) # set large workspace size
         chainer.backends.cuda.get_device_from_id(args.gpu).use()
         model.to_gpu()  # Copy the model to the GPU
     
