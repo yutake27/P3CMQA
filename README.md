@@ -1,5 +1,4 @@
-# P3CMQA
-
+# P3CMQA <!-- omit in toc --> 
 P3CMQA is a protein model quality assessment tool using 3DCNN.
 
 A paper about this method is in preparation.
@@ -8,7 +7,23 @@ The web server version is available at this [page](http://www.cb.cs.titech.ac.jp
 
 If you want to use a local version, please download this repository.
 
-
+## Table of Contents <!-- omit in toc --> 
+- [Requirements](#requirements)
+  - [Software and databases that must be installed](#software-and-databases-that-must-be-installed)
+  - [Requirements when not using Docker images](#requirements-when-not-using-docker-images)
+- [Sample data directory structure](#sample-data-directory-structure)
+- [Usage without Docker](#usage-without-docker)
+  - [1. Preprocess](#1-preprocess)
+  - [2. Side Chain optimization using `Scwrl4`   (**optional**)](#2-side-chain-optimization-using-scwrl4---optional)
+  - [3. Prediction](#3-prediction)
+- [Usage with docker](#usage-with-docker)
+  - [1. Pull docker image](#1-pull-docker-image)
+  - [2. Preprocess](#2-preprocess)
+  - [3. Side Chain optimization using `Scwrl4`   (**optional**)](#3-side-chain-optimization-using-scwrl4---optional)
+  - [4. Prediction with docker](#4-prediction-with-docker)
+- [Output format](#output-format)
+- [Training and test data](#training-and-test-data)
+- [Reference](#reference)
 
 ## Requirements
 In this method, there are two main processes: preprocessing and prediction.
@@ -80,7 +95,7 @@ Therefore, the preprocessing part should be installed regardless of whether you 
 
     The 64-bit version is available at https://ftp.ncbi.nlm.nih.gov/blast/executables/legacy.NOTSUPPORTED/2.2.26.
 
-5. Clone this repositorie and download the pre-trained model
+5. Clone this repository and download the pre-trained model
 
     The trained model is not included in the GitHub repository, so you have to download it and put it directly under the repository.
 
@@ -253,7 +268,7 @@ Then You can get `sample.pssm`,` sample.ss` and `sample.acc20` under `data/profi
 
 
 ## Usage with docker
-### 1. pull docker image
+### 1. Pull docker image
 We have released two versions of the image on Dockerhub, a CPU version, and a GPU version. The Dockerhub repository is [here](https://hub.docker.com/repository/docker/yutake27/p3cmqa).
 
 If you do not have a GPU environment, please pull `yutake27/p3cmqa:cpu`.
@@ -274,7 +289,7 @@ docker pull yutake27/p3cmqa:cuda11.0-cudnn8
 
 If you want to use another version of CUDA or cuDNN, please modify the Dockerfile included in the repository and build it. Note that it is possible to perform a prediction without cuDNN.
 
-### 2. preprocess
+### 2. Preprocess
 ```sh
 $ python preprocess.py -f ../data/fasta/sample.fasta -d $uniref90/uniref90 -n num_thread
 ```
@@ -283,7 +298,12 @@ Use `-f` to specify the fasta file path, `-d` to specify the uniref90 database p
 
 Then You can get ```sample.pssm```,``` sample.ss``` and ```sample.acc20``` under ```data/profile/sample```.
 
-### 3.prediction with docker
+### 3. Side Chain optimization using `Scwrl4`   (**optional**)
+
+   ```bash
+   $ Scwrl4 -i sample_1.pdb -o sample_1.pdb
+   ```
+### 4. Prediction with docker
 There is a python script named `docker_predict.py` to simplify prediction with Docker.
 
 This script starts the container, executes the prediction, and terminates the container, so there is no need to enter docker commands by yourself.
@@ -299,10 +319,17 @@ The arguments other than the name of the docker image are the same as without do
 If you do not use the above script, please run the container and execute the prediction as follows.
 ```sh
 # docker run
-docker run -dit --rm -u "$(id -u $USER):$(id -g $USER)" --gpus=0 -v /absolute/path/to/P3CMQA:/home -v /absolute/path/to/P3CMQA/data/pdb/sample:/home/data/pdb/sample -v /absolute/path/to/P3CMQA/data/fasta:/home/data/fasta/ -v /absolute/path/to/P3CMQA/data/profile/sample:/home/data/profile/sample -v /absolute/path/to/P3CMQA/data/score/sample:/home/data/score/sample --name p3cmqa yutake27/p3cmqa:cuda11.0-cudnn8
+docker run -dit --rm -u "$(id -u $USER):$(id -g $USER)" --gpus=0 \
+-v /absolute/path/to/P3CMQA:/home \
+-v /absolute/path/to/P3CMQA/data/pdb/sample:/home/data/pdb/sample \
+-v /absolute/path/to/P3CMQA/data/fasta:/home/data/fasta/ \
+-v /absolute/path/to/P3CMQA/data/profile/sample:/home/data/profile/sample \
+-v /absolute/path/to/P3CMQA/data/score/sample:/home/data/score/sample \
+ --name p3cmqa yutake27/p3cmqa:cuda11.0-cudnn8
 
 # docker exec
-docker exec -it -u "$(id -u $USER):$(id -g $USER)" p3cmqa /bin/bash -c "cd home/src && python predict.py -d ../data/pdb/sample -f ../data/fasta/sample.fasta -g 0"
+docker exec -it -u "$(id -u $USER):$(id -g $USER)" p3cmqa /bin/bash \
+-c "cd home/src && python predict.py -d ../data/pdb/sample -f ../data/fasta/sample.fasta -g 0"
 ```
 
 ## Output format
