@@ -1,19 +1,22 @@
+import argparse
+import copy
+import gc
+import json
+from functools import partial
+from pathlib import Path
+
 import chainer
 import chainer.functions as F
 import chainer.links as L
 import numpy as np
-import json
-import argparse
-import copy
+import pandas as pd
+from chainer import Variable
 from chainer.function import no_backprop_mode
 from chainer.sequential import Sequential
 from chainer.serializers import load_npz
-from chainer import Variable
-from functools import partial
+
 from make_voxel import get_voxel_predict
-import pandas as pd
-import os, gc
-from pathlib import Path
+
 
 def hinted_tuple_hook(obj):
     if '__tuple__' in obj:
@@ -60,7 +63,7 @@ def get_predict_value(data, model, gpu):
         pred_score = chainer.cuda.to_cpu(pred_score.data).ravel()
         out_list.extend(pred_score)
         i += 1
-    return np.array(out_list) 
+    return np.array(out_list)
 
 
 def output_score(input_path, output_path, predict_value, resid, resname):
@@ -79,59 +82,63 @@ def output_score_stdout(input_path, global_score):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Predict ')
+    parser = argparse.ArgumentParser(description='P3CMQA')
     parser.add_argument('--gpu', '-g', type=int, default=-1,
-                        help='GPU ID (negative value indicates CPU)')
-    parser.add_argument('--input_path', '-i', help='Input data path')
-    parser.add_argument('--input_dir_path','-d', help='Input dir data path')
-    parser.add_argument('--fasta_path', '-f', required=True, help='Reference FASTA Sequence path')
-    parser.add_argument('--model_path', '-m', help='Pre-trained model path', default='../trained_model.npz')
-    parser.add_argument('--preprocess_dir', '-p', help='Input preprocess directory')
-    parser.add_argument('--output_dir', '-o', help='Output directory')
-    parser.add_argument('--save_res', '-s', action='store_true', help='save score of each residue')
+                        help='GPU ID (negative value indicates CPU, default = -1)')
+    parser.add_argument('--input_path', '-i', help='The path to a single PDB/mmCIF file')
+    parser.add_argument('--input_dir_path', '-d', help='The path to a directory of multiple PDB/mmCIF files')
+    parser.add_argument('--fasta_path', '-f', required=True, help='The path to a Reference FASTA file')
+    parser.add_argument('--model_path', '-m', help='The path to a Pre-trained model', default='../trained_model.npz')
+    parser.add_argument('--preprocess_dir', '-p', help='The path to a preprocess directory')
+    parser.add_argument('--output_dir', '-o', help='The path to a output directory')
+    parser.add_argument('--save_res', '-s', action='store_true',
+                        help='Save the score for each residue (not required if using "-i" option)')
     args = parser.parse_args()
     model = get_model(json.load(open('./config.json', 'r'), object_hook=hinted_tuple_hook))
     load_npz(file=args.model_path, obj=model, path='updater/model:main/predictor/')
     if args.gpu >= 0:
-        ws_size = 512 * 1024 * 1024 # 512 MB
-        chainer.cuda.set_max_workspace_size(ws_size) # set large workspace size
+        ws_size = 512 * 1024 * 1024  # 512 MB
+        chainer.cuda.set_max_workspace_size(ws_size)  # set large workspace size
         chainer.backends.cuda.get_device_from_id(args.gpu).use()
         model.to_gpu()  # Copy the model to the GPU
-    
+
     target = Path(args.fasta_path).stem
     # preprocess directory
     if not args.preprocess_dir:
-        args.preprocess_dir = Path('../data/profile')/target
+        args.preprocess_dir = Path('../data/profile') / target
     preprocess_dir = Path(args.preprocess_dir)
-    pssm_path = (preprocess_dir/target).with_suffix('.pssm')
-    ss_path = (preprocess_dir/target).with_suffix('.ss')
-    acc20_path = (preprocess_dir/target).with_suffix('.acc20')
+    pssm_path = (preprocess_dir / target).with_suffix('.pssm')
+    ss_path = (preprocess_dir / target).with_suffix('.ss')
+    acc20_path = (preprocess_dir / target).with_suffix('.acc20')
     # output directory
     if args.output_dir:
         output_dir = Path(args.output_dir)
     else:
-        output_dir = Path('../data/score')/target
+        output_dir = Path('../data/score') / target
     output_dir.mkdir(exist_ok=True, parents=True)
-
 
     if args.input_path:
         input_path = args.input_path
-        data, resname, resid = get_voxel_predict(input_path=input_path, fasta_path=args.fasta_path, pssm_path=pssm_path, ss_path=ss_path, acc20_path=acc20_path, buffer=28, width=1)
+        data, resname, resid = get_voxel_predict(input_path=input_path, fasta_path=args.fasta_path,
+                                                 pssm_path=pssm_path, ss_path=ss_path,
+                                                 acc20_path=acc20_path, buffer=28, width=1)
         predict_value = get_predict_value(data=data, model=model, gpu=args.gpu)
         global_score = np.mean(predict_value)
         output_score_stdout(input_path, global_score)
         output_path = (output_dir / Path(input_path).stem).with_suffix('.txt')
         output_score(input_path, output_path, predict_value, resid, resname)
-        
+
     elif args.input_dir_path:
         input_dir_path = Path(args.input_dir_path)
         model_array = []
         global_score_array = []
         for input_path in input_dir_path.iterdir():
             model_name = input_path.stem
-           
+
             try:
-                data, _, resid = get_voxel_predict(input_path=str(input_path), fasta_path=args.fasta_path, pssm_path=pssm_path, ss_path=ss_path, acc20_path=acc20_path, buffer=28, width=1)
+                data, resname, resid = get_voxel_predict(input_path=str(input_path), fasta_path=args.fasta_path,
+                                                                     pssm_path=pssm_path, ss_path=ss_path,
+                                                                     acc20_path=acc20_path, buffer=28, width=1)
             except Exception as e:
                 model_array.append(model_name)
                 global_score_array.append(None)
@@ -145,12 +152,12 @@ if __name__ == '__main__':
                 global_score_array.append(global_score)
                 output_score_stdout(input_path, global_score)
                 if args.save_res:
-                    output_path = (output_dir/model_name).with_suffix('.txt')
+                    output_path = (output_dir / model_name).with_suffix('.txt')
                     output_score(input_path, output_path, predict_value, resid, resname)
                 del data, resid
                 gc.collect()
-        
+
         df = pd.DataFrame({'Score': global_score_array, 'Model_name': model_array}).set_index('Model_name')
         df = df.sort_index()
-        output_path = (output_dir/target).with_suffix('.csv')
+        output_path = (output_dir / target).with_suffix('.csv')
         df.to_csv(output_path)
