@@ -6,6 +6,7 @@ from functools import reduce
 from pathlib import Path
 
 import numpy as np
+import prody
 from Bio import AlignIO, SeqIO
 from prody import LOGGER, parseMMCIF, parsePDB
 
@@ -139,6 +140,17 @@ def get_voxel_predict(input_path, fasta_path, pssm_path, ss_path, acc20_path, bu
     return occus, input_mol.select('name CA').getResnames(), input_mol.select('name CA').getResnums()
 
 
+def parse_mmCIF(input_path: str):
+    try:
+        input_mol = parseMMCIF(input_path)
+    except Exception:
+        raise ValueError('Unable to read the input file: {}'.format(input_path))
+    else:
+        if input_mol is None:
+            raise ValueError('Unable to read the input file: {}'.format(input_path))
+    return input_mol
+
+
 def parse_input_file(input_path: str):
     input_path = Path(input_path)
     if input_path.suffix == '.pdb':
@@ -146,9 +158,13 @@ def parse_input_file(input_path: str):
     elif input_path.suffix == '.cif':
         input_mol = parseMMCIF(input_path)
     else:
-        input_mol = parsePDB(input_path)
-        if input_mol is None:
-            input_mol = parseMMCIF(input_path)
+        try:
+            input_mol = parsePDB(input_path)
+        except prody.proteins.pdbfile.PDBParseError:
+            input_mol = parse_mmCIF(input_path)
+        else:
+            if input_mol is None:
+                input_mol = parse_mmCIF(input_path)
     return input_mol
 
 
