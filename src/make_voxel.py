@@ -1,11 +1,16 @@
-import numpy as np
-import sys, tempfile, subprocess
-from functools import reduce
-from calculate_axis import get_axis
-from amino import get_atom_type_array
-from Bio import AlignIO, SeqIO
-from prody import parsePDB, LOGGER
 import os
+import subprocess
+import sys
+import tempfile
+from functools import reduce
+from pathlib import Path
+
+import numpy as np
+from Bio import AlignIO, SeqIO
+from prody import LOGGER, parseMMCIF, parsePDB
+
+from amino import get_atom_type_array
+from calculate_axis import get_axis
 
 LOGGER.verbosity = 'none'
 
@@ -124,7 +129,7 @@ def get_voxel_train(input_path, target_path, pssm_path, ss_path, acc20_path, buf
 
 
 def get_voxel_predict(input_path, fasta_path, pssm_path, ss_path, acc20_path, buffer, width):
-    input_mol = parsePDB(input_path)
+    input_mol = parse_input_file(input_path)
     input_mol = input_mol.select('element C or element N or element O or element S')
     pssm = get_pssm(pssm_path)
     predicted_ss = get_predicted_ss(ss_path)
@@ -132,6 +137,19 @@ def get_voxel_predict(input_path, fasta_path, pssm_path, ss_path, acc20_path, bu
     occus,input_mol = make_voxel_predict(input_mol=input_mol, fasta_path=fasta_path, pssm=pssm,
                                 predicted_ss=predicted_ss, predicted_acc20=predicted_acc20, buffer=buffer, width=width)
     return occus, input_mol.select('name CA').getResnames(), input_mol.select('name CA').getResnums()
+
+
+def parse_input_file(input_path: str):
+    input_path = Path(input_path)
+    if input_path.suffix == '.pdb':
+        input_mol = parsePDB(input_path)
+    elif input_path.suffix == '.cif':
+        input_mol = parseMMCIF(input_path)
+    else:
+        input_mol = parsePDB(input_path)
+        if input_mol is None:
+            input_mol = parseMMCIF(input_path)
+    return input_mol
 
 
 def get_pssm(file_path):
