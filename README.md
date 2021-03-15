@@ -142,18 +142,6 @@ Therefore, the preprocessing part should be installed regardless of whether you 
     $ pip install prody
     ```
 
-4. [EMBOSS](http://emboss.sourceforge.net/download/#Stable) (to align pdb and fasta)
-
-    ```bash
-    $ wget ftp://emboss.open-bio.org/pub/EMBOSS/EMBOSS-6.6.0.tar.gz
-    $ tar -xvzf EMBOSS-6.60.tar.gz
-    $ cd EMBOSS-6.60
-    $ ./configure --prefix=hoge
-    $ make
-    $ make install
-    ```
-
-    Please export PATH to EMBOSS package to use `needle`.
 
 ## Sample data directory structure
 
@@ -391,7 +379,6 @@ Please note that the download size is large.
 ## Reference
 1. Y. Takei and T.Ishida, in preparation.
 2. R. Sato and T. Ishida, “Protein model accuracy estimation based on local structure quality assessment using 3D convolutional neural network,” *PLoS One*, vol. 14, no. 9, p. e0221347, 2019. Available from:https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0221347
-3. P. Rice, I. Longden, and A. Bleasby, “EMBOSS: The European Molecular Biology Open Software Suite,” *Trends Genet.*, vol. 16, no. 6, pp. 276–277, Jun. 2000. Available from: http://europepmc.org/article/MED/10827456
-4. G. G. Krivov, M. V. Shapovalov, and R. L. Dunbrack, “Improved prediction of protein side-chain conformations with SCWRL4,” *Proteins Struct. Funct. Bioinforma.*, vol. 77, no. 4, pp. 778–795, 2009. Available from: https://pubmed.ncbi.nlm.nih.gov/19603484/
-5. D. J. Lipman *et al.*, “Gapped BLAST and PSI-BLAST: a new generation of protein database search programs,” *Nucleic Acids Res.*, vol. 25, no. 17, pp. 3389–3402, 1997. Available from: https://pubmed.ncbi.nlm.nih.gov/9254694/ 
-6. C. N. Magnan and P. Baldi, “SSpro/ACCpro 5: Almost perfect prediction of protein secondary structure and relative solvent accessibility using profiles, machine learning and structural similarity,” *Bioinformatics*, vol. 30, no. 18, pp. 2592–2597, 2014. Available from: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4215083/
+3. G. G. Krivov, M. V. Shapovalov, and R. L. Dunbrack, “Improved prediction of protein side-chain conformations with SCWRL4,” *Proteins Struct. Funct. Bioinforma.*, vol. 77, no. 4, pp. 778–795, 2009. Available from: https://pubmed.ncbi.nlm.nih.gov/19603484/
+4. D. J. Lipman *et al.*, “Gapped BLAST and PSI-BLAST: a new generation of protein database search programs,” *Nucleic Acids Res.*, vol. 25, no. 17, pp. 3389–3402, 1997. Available from: https://pubmed.ncbi.nlm.nih.gov/9254694/
+5. C. N. Magnan and P. Baldi, “SSpro/ACCpro 5: Almost perfect prediction of protein secondary structure and relative solvent accessibility using profiles, machine learning and structural similarity,” *Bioinformatics*, vol. 30, no. 18, pp. 2592–2597, 2014. Available from: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4215083/
