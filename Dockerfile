@@ -8,7 +8,6 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
     python3-wheel \
     python3-setuptools \
     g++ \
-    emboss \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
