@@ -37,15 +37,11 @@ class Docker:
         self.container_id = container_id
         print('Container ID:', container_id)
 
-    def exec(self, cmd_str: str) -> None:
+    def exec(self, workspace: str, cmd_list: List[str]) -> None:
         assert self.container_id
-        cmd = ['docker', 'exec', '-it', '-u', self.user_info, self.container_name, '/bin/bash', '-c', cmd_str]
+        cmd = ['docker', 'exec', '-it', '-u', self.user_info, '-w', workspace, self.container_name] + cmd_list
         print(' '.join(cmd))
-        cp = subprocess.run(cmd, capture_output=True, text=True)
-        if cp.stderr:
-            print(cp.stderr)
-        if cp.stdout:
-            print(cp.stdout)
+        subprocess.run(cmd)
 
     def stop(self) -> None:
         assert self.container_id
@@ -98,24 +94,24 @@ class DockerPredict:
         output_dir_volume = str(self.output_dir_path) + ':/home/data/score/' + self.target_name
         return [repository_dir_volume, pdb_dir_volume, fasta_dir_volume, profile_dir_volume, output_dir_volume]
 
-    def get_predict_cmd_str(self) -> str:
-        predict_cmd = ['cd', 'home/src', '&&', 'python', 'predict.py']
+    def get_predict_cmd_str(self) -> (List[str], str):
+        workspace = '/home/src'
+        predict_cmd_list = ['python', 'predict.py']
         if self.pdb_file_path:
             model_file_name = Path(self.pdb_file_path).name
-            predict_cmd.extend(['-i', '../data/pdb/' + self.target_name + '/' + model_file_name])
+            predict_cmd_list.extend(['-i', '../data/pdb/' + self.target_name + '/' + model_file_name])
         else:
-            predict_cmd.extend(['-d', '../data/pdb/' + self.target_name])
-        predict_cmd.extend(['-f', '../data/fasta/' + self.target_name + '.fasta', '-g', str(self.gpu_id)])
-        predict_cmd_str = ' '.join(predict_cmd)
-        return predict_cmd_str
+            predict_cmd_list.extend(['-d', '../data/pdb/' + self.target_name])
+        predict_cmd_list.extend(['-f', '../data/fasta/' + self.target_name + '.fasta', '-g', str(self.gpu_id)])
+        return workspace, predict_cmd_list
 
     def predict(self) -> None:
         docker = Docker(self.image_name, self.gpu_id, self.container_name)
         print('#### docker run ####')
         docker.run_detached(self.volume_dir_list)
         print('#### docker exec ####')
-        predict_cmd_str = self.get_predict_cmd_str()
-        docker.exec(predict_cmd_str)
+        workspace, predict_cmd_list = self.get_predict_cmd_str()
+        docker.exec(workspace, predict_cmd_list)
         print('#### docker stop ####')
         docker.stop()
 
