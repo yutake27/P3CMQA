@@ -7,7 +7,7 @@ from pathlib import Path
 
 import numpy as np
 import prody
-from Bio import AlignIO, SeqIO
+from Bio import AlignIO, SeqIO, pairwise2
 from prody import LOGGER, parseMMCIF, parsePDB
 
 from amino import get_atom_type_array
@@ -16,27 +16,35 @@ from calculate_axis import get_axis
 LOGGER.verbosity = 'none'
 
 
+def read_fasta(fasta_path: str) -> str:
+    fasta = SeqIO.read(fasta_path, 'fasta')
+    return fasta.seq
+
+
+def align_seq(seqa: str, seqb: str):
+    alignment_list = pairwise2.align.globalms(seqa, seqb, 5, -10, -2, -1)
+    alignment = None
+    var_indices_min = float('inf')
+    for a in alignment_list:
+        var_indices = np.var(np.where(np.array(list(a.seqA)) != '-')[0])
+        if var_indices < var_indices_min:
+            alignment = a
+            var_indices_min = var_indices
+    align_seqa, align_seqb = np.array(list(alignment.seqA)), np.array(list(alignment.seqB))
+    align_seqa, align_seqb = align_seqa[np.where(align_seqb != '-')], align_seqb[np.where(align_seqa != '-')]
+    align_aindices = np.where(align_seqb != '-')[0]
+    align_bindices = np.where(align_seqa != '-')[0]
+    return align_seqa, align_seqb, align_aindices, align_bindices
+
+
 def align_fasta(input_mol, target_fasta_path):
-    _, input_fasta_path = tempfile.mkstemp(suffix='.fasta')
-    f = open(input_fasta_path, 'w')
-    f.write('>temp\n')
     if len(input_mol.select('name CA').getSequence()) < 25:
         return None, None, None
     else:
-        f.write(reduce(lambda a, b: a + b, input_mol.select('name CA').getSequence()))
-        f.close()
-        _, needle_path = tempfile.mkstemp(suffix='.needle')
-        cmd = ['needle', '-outfile', needle_path, '-asequence', input_fasta_path, '-bsequence', target_fasta_path,
-               '-gapopen', '10', '-gapextend', '0.5']
-        subprocess.call(cmd)
-        needle_result = list(AlignIO.parse(needle_path, 'emboss'))[0]
-        input_seq, target_seq = np.array(list(str(needle_result[0].seq))), np.array(list(str(needle_result[1].seq)))
-        input_seq, target_seq = input_seq[np.where(target_seq != '-')], target_seq[np.where(input_seq != '-')]
-        input_align_indices = np.where(target_seq != '-')[0]
-        target_align_indices = np.where(input_seq != '-')[0]
+        input_seq = input_mol.select('name CA').getSequence()
+        target_seq = read_fasta(target_fasta_path)
+        input_seq, target_seq, input_align_indices, target_align_indices = align_seq(input_seq, target_seq)
         align_pdb = input_mol.select('resindex ' + reduce(lambda a, b: str(a) + ' ' + str(b), input_align_indices))
-        os.remove(input_fasta_path)
-        os.remove(needle_path)
         return align_pdb, target_align_indices, input_align_indices
 
 
