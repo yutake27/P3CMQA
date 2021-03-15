@@ -1,2 +1,9 @@
 src/__pycache__
 src/.ipynb_checkpoints
+.vscode
+data/pdb/casp14_native_result
+data/pdb/chain
+data/pdb/result
+.DS_Store
+*.tar.gz
+data/result/txt
