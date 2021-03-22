@@ -377,8 +377,8 @@ Please note that the download size is large.
 
 
 ## Reference
-1. Y. Takei and T.Ishida, in preparation.
-2. R. Sato and T. Ishida, “Protein model accuracy estimation based on local structure quality assessment using 3D convolutional neural network,” *PLoS One*, vol. 14, no. 9, p. e0221347, 2019. Available from:https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0221347
+1. Y. Takei and T.Ishida, “P3CMQA: Single-Model Quality Assessment Using 3DCNN with Profile-Based Features,” Bioengineering, vol. 8, no. 3, 2021. Available from: https://doi.org/10.3390/bioengineering8030040 
+2. R. Sato and T. Ishida, “Protein model accuracy estimation based on local structure quality assessment using 3D convolutional neural network,” *PLoS One*, vol. 14, no. 9, p. e0221347, 2019. Available from: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0221347
 3. G. G. Krivov, M. V. Shapovalov, and R. L. Dunbrack, “Improved prediction of protein side-chain conformations with SCWRL4,” *Proteins Struct. Funct. Bioinforma.*, vol. 77, no. 4, pp. 778–795, 2009. Available from: https://pubmed.ncbi.nlm.nih.gov/19603484/
 4. D. J. Lipman *et al.*, “Gapped BLAST and PSI-BLAST: a new generation of protein database search programs,” *Nucleic Acids Res.*, vol. 25, no. 17, pp. 3389–3402, 1997. Available from: https://pubmed.ncbi.nlm.nih.gov/9254694/
 5. C. N. Magnan and P. Baldi, “SSpro/ACCpro 5: Almost perfect prediction of protein secondary structure and relative solvent accessibility using profiles, machine learning and structural similarity,” *Bioinformatics*, vol. 30, no. 18, pp. 2592–2597, 2014. Available from: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4215083/
