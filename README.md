@@ -99,12 +99,12 @@ Therefore, the preprocessing part should be installed regardless of whether you 
 
     The trained model is not included in the GitHub repository, so you have to download it and put it directly under the repository.
 
-    We provide the pre-training model at [here](http://www.cb.cs.titech.ac.jp/~takei/P3CMQA/trained_model.npz).
+    We provide the pre-training model at [here](http://www.cb.cs.titech.ac.jp/p3cmqa/trained_model.npz).
 
     ```sh
     $ git clone https://github.com/yutake27/P3CMQA.git
     $ cd P3CMQA
-    $ wget http://www.cb.cs.titech.ac.jp/~takei/P3CMQA/trained_model.npz
+    $ wget http://www.cb.cs.titech.ac.jp/p3cmqa/trained_model.npz
     $ ls
     LICENSE  README.md  data  result  src  trained_model.npz
     ```
