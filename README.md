@@ -16,6 +16,8 @@ If you want to use a local version, please download this repository.
   - [1. Preprocess](#1-preprocess)
   - [2. Side Chain optimization using `Scwrl4`   (**optional**)](#2-side-chain-optimization-using-scwrl4---optional)
   - [3. Prediction](#3-prediction)
+    - [If you want to predict multiple model structure for one target](#if-you-want-to-predict-multiple-model-structure-for-one-target)
+    - [If you want to predict single model structure](#if-you-want-to-predict-single-model-structure)
 - [Usage with docker](#usage-with-docker)
   - [1. Pull docker image](#1-pull-docker-image)
   - [2. Preprocess](#2-preprocess)
@@ -182,78 +184,83 @@ Then You can get `sample.pssm`,` sample.ss` and `sample.acc20` under `data/profi
 
 ### 3. Prediction
 
-* ### **If you want to predict multiple model structure for one target**
+Usage
+```txt
+usage: predict.py [-h] [--gpu GPU] [--input_path INPUT_PATH]
+                  [--input_dir_path INPUT_DIR_PATH] --fasta_path FASTA_PATH
+                  [--model_path MODEL_PATH] [--preprocess_dir PREPROCESS_DIR]
+                  [--output_dir OUTPUT_DIR] [--save_res]
 
-    ```bash
-    $ python predict.py -d ../data/pdb/sample -f ../data/fasta/sample.fasta
-    ```
+P3CMQA
 
-    Use `-d` to specify the pdb directory path and `-f` to specify the fasta file path.
+optional arguments:
+  -h, --help            show this help message and exit
+  --gpu GPU, -g GPU     GPU ID (negative value indicates CPU, default = -1)
+  --input_path INPUT_PATH, -i INPUT_PATH
+                        The path to a single PDB/mmCIF file
+  --input_dir_path INPUT_DIR_PATH, -d INPUT_DIR_PATH
+                        The path to a directory of multiple PDB/mmCIF files
+  --fasta_path FASTA_PATH, -f FASTA_PATH
+                        The path to a Reference FASTA file
+  --model_path MODEL_PATH, -m MODEL_PATH
+                        The path to a Pre-trained model
+  --preprocess_dir PREPROCESS_DIR, -p PREPROCESS_DIR
+                        The path to a preprocess directory
+  --output_dir OUTPUT_DIR, -o OUTPUT_DIR
+                        The path to a output directory
+  --save_res, -s        Save the score for each residue (not required if using
+                        "-i" option)
+```
 
-    The results are written under `data/score/sample`.
-    You will get a file with the global score of all model structures and files with the scores of each residue for each model structure.
+#### If you want to predict multiple model structure for one target
 
-    In this example, you will get `data/score/sample/sample.csv`.
+```bash
+$ python predict.py -d ../data/pdb/sample -f ../data/fasta/sample.fasta
+```
 
+Use `-d` to specify the pdb directory path and `-f` to specify the fasta file path.
 
-    If you have a **GPU**,
+The results are written under `data/score/sample`.
+You will get a file with the global score of all model structures and files with the scores of each residue for each model structure.
 
-    ```bash
-    $ python predict.py -d ../data/pdb/sample -f ../data/fasta/sample.fasta -g 0
-    ```
-
-    Use `-g` to specify the GPU ID (negative value indicates CPU).
-
-    If you want to **specify the output directory**,
-
-    ```bash
-    $ python predict.py -d ../data/pdb/sample -f ../data/fasta/sample.fasta -o path/to/dir
-    ```
-
-    Use `-o` to specify the directory path where you want to output the results.
-
-    The results are written in   `path/to/dir/sample.csv`.
-
-    If you want to **sepecify the profile directory**,
-
-    ```bash
-    $ python predict.py -d ../data/pdb/sample -f ../data/fasta/sample.fasta -p path/to/profile/dir
-    ```
-
-    Directory `path/to/profile/dir` should have `sample.pssm`, `sample.ss` and `sample.acc20`.
+In this example, you will get `data/score/sample/sample.csv`.
 
 
-* ### **If you want to predict single model structure**
+If you have a **GPU**,
 
-    ```bash
-    $ python predict.py -i ../data/pdb/sample/samle_1.pdb -f ../data/fasta/sample.fasta
-    ```
+```bash
+$ python predict.py -d ../data/pdb/sample -f ../data/fasta/sample.fasta -g 0
+```
 
-    Use ```-i``` to specify the pdb file path and `-f` to specify the fasta file path.
-    The results are written in ```data/score/sample/sample_1.txt```.
+Use `-g` to specify the GPU ID (negative value indicates CPU).
 
-    
+If you want to **specify the output directory**,
 
-    If you have a **GPU**,
-    
-    ```bash
-    $ python predict.py -i ../data/pdb/sample/sample_1.pdb -f ../data/fasta/sample.fasta -g 0
-    ```
-    
-    Use `-g` to specify the GPU ID (negative value indicates CPU).
-    
-    
-    
-    If you want to **specify the output directory**, 
-    
-    ```bash
-    $ python predict.py -i ../data/pdb/sample/samle_1.pdb -f ../data/fasta/sample.fasta -o path/to/dir
-    ```
-    
-    Use `-o` to specify the directory path where you want to output the results.
-    
-    The results are written in ```path/to/dir/sample_1.txt```
+```bash
+$ python predict.py -d ../data/pdb/sample -f ../data/fasta/sample.fasta -o path/to/dir
+```
 
+Use `-o` to specify the directory path where you want to output the results.
+
+The results are written in   `path/to/dir/sample.csv`.
+
+If you want to **sepecify the profile directory**,
+
+```bash
+$ python predict.py -d ../data/pdb/sample -f ../data/fasta/sample.fasta -p path/to/profile/dir
+```
+
+Directory `path/to/profile/dir` should have `sample.pssm`, `sample.ss` and `sample.acc20`.
+
+
+#### If you want to predict single model structure
+
+```bash
+$ python predict.py -i ../data/pdb/sample/samle_1.pdb -f ../data/fasta/sample.fasta
+```
+
+Use `-i` to specify the pdb file path and `-f` to specify the fasta file path.
+The results are written in ```data/score/sample/sample_1.txt```.
 
 ## Usage with docker
 ### 1. Pull docker image
