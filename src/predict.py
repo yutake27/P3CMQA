@@ -132,8 +132,21 @@ if __name__ == '__main__':
         input_dir_path = Path(args.input_dir_path)
         model_array = []
         global_score_array = []
-        for input_path in input_dir_path.iterdir():
+        for input_path in input_dir_path.glob('*.pdb'):
             model_name = input_path.stem
+            output_csv_path = (output_dir / model_name).with_suffix('.txt')
+            if output_csv_path.exists():  # If already exists, skip the execution
+                print('Already done', input_path)
+                try:
+                    local_df = pd.read_csv(output_csv_path, sep='\t', header=2)
+                except Exception as e:
+                    print(e)
+                else:
+                    model_array.append(model_name)
+                    global_score = local_df['Score'].mean()
+                    global_score_array.append(global_score)
+                    output_score_stdout(input_path, global_score)
+                    continue
 
             try:
                 data, resname, resid = get_voxel_predict(input_path=str(input_path), fasta_path=args.fasta_path,
@@ -152,8 +165,7 @@ if __name__ == '__main__':
                 global_score_array.append(global_score)
                 output_score_stdout(input_path, global_score)
                 if args.save_res:
-                    output_path = (output_dir / model_name).with_suffix('.txt')
-                    output_score(input_path, output_path, predict_value, resid, resname)
+                    output_score(input_path, output_csv_path, predict_value, resid, resname)
                 del data, resid
                 gc.collect()
 
