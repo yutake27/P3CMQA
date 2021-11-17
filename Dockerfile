@@ -1,6 +1,6 @@
 FROM nvidia/cuda:11.0-cudnn8-runtime-ubuntu18.04
 #================================
-# Install basics and emboss
+# Install basics
 #================================
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
     python3-dev \
@@ -8,7 +8,6 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
     python3-wheel \
     python3-setuptools \
     g++ \
-    emboss \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 

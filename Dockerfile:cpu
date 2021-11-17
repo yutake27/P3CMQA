@@ -1,13 +1,5 @@
 FROM python:3.8
 #================================
-# Install emboss
-#================================
-RUN apt-get update -y && apt-get install -y --no-install-recommends \
-    emboss \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
-
-#================================
 # Install python library
 #================================
 RUN pip install -U --no-cache-dir pip

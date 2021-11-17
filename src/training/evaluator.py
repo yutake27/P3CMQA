@@ -202,6 +202,7 @@ class Classification_Evaluator(Evaluator):
                 y_score = F.sigmoid(gather_y).data
                 plot_roc(y_true=gather_t, y_score=y_score, out_name=roc_out_name)
                 roc_auc = metrics.roc_auc_score(gather_t, y_score)
+                np.savez((out_dir/epoch).with_suffix('.npz'), local_label=gather_t, local_score=y_score, protein_id=gather_protein_id)
                 with reporter.report_scope(observation):
                     reporter.report({'roc_auc_'+label: roc_auc}, self._targets['main'])
                     reporter.report({'loss': F.sigmoid_cross_entropy(gather_y, gather_t).data},
@@ -358,6 +359,7 @@ class MultiClassification_Evaluator(Evaluator):
             spearman = df.groupby('target_name').corr(method='spearman')['global_score'].mean(level=1)['global_label']
             csv_out_name = out_dir/(epoch+'_df.csv')
             df.to_csv(csv_out_name)
+            np.savez((out_dir/epoch).with_suffix('.npz'), local_label=gather_t, local_score=y_score, protein_id=gather_protein_id)
             with reporter.report_scope(observation):
                 reporter.report({'loss': F.softmax_cross_entropy(gather_y, gather_t).data},
                                     self._targets['main'])
@@ -518,7 +520,7 @@ class Regression_Evaluator(Evaluator):
                 spearman = df.groupby('target_name').corr(method='spearman')['global_score'].mean(level=1)['global_label']
                 csv_out_name = out_dir/(epoch+label+'_df.csv')
                 df.to_csv(csv_out_name)
-
+                np.savez((out_dir/epoch).with_suffix('.npz'), local_label=gather_t, local_score=y_score, protein_id=gather_protein_id)
                 with reporter.report_scope(observation):
                     reporter.report({'loss': F.mean_squared_error(gather_y, gather_t).data},
                                     self._targets['main'])
