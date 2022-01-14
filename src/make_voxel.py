@@ -60,25 +60,27 @@ def calc_occupancy_bool(atom_coord, channel, buffer, width, axis):
         h = channel[i]
         occus[atom_coord[i][0]][atom_coord[i][1]][atom_coord[i][2]] += h
     occus = occus.transpose([3, 0, 1, 2])
-    index = occus[13,:,:,:] > 1
-    occus[:,index] = np.concatenate((np.logical_or(occus[:14,index],0), occus[14:34,index]/occus[13,index],
-                        np.logical_or(occus[34:37,index],0), np.array([occus[37,index]/occus[13,index]])))
+    index = occus[13, :, :, :] > 1
+    occus[:, index] = np.concatenate((np.logical_or(occus[:14, index], 0),
+                                      occus[14: 34, index] / occus[13, index],
+                                      np.logical_or(occus[34: 37, index], 0),
+                                      np.array([occus[37, index] / occus[13, index]])))
     return occus
 
 
 def get_atom_target_index(target_index, input_index, resindices):
     """get target indices of input atom
-    
+
     Arguments:
         target_index {array} -- target(native) residue index
         input_index {array} -- input residue index
         resindices {array} -- target residue index of input atoms
-    
+
     Returns:
         array -- target indices of input atom
     """
     dic = {}
-    for i,j in zip(input_index, target_index):
+    for i, j in zip(input_index, target_index):
         dic[i] = j
     atom_target_residue_index = []
     for index in resindices:
@@ -132,8 +134,9 @@ def get_voxel_train(input_path, target_path, pssm_path, ss_path, acc20_path, buf
     pssm = get_pssm(pssm_path)
     predicted_ss = get_predicted_ss(ss_path)
     predicted_acc20 = get_predicted_acc20(acc20_path)
-    occus,input_mol = make_voxel_train(input_mol=input_mol, target_mol=target_mol, pssm=pssm,
-            predicted_ss=predicted_ss, predicted_acc20=predicted_acc20, buffer=buffer, width=width)
+    occus, input_mol = make_voxel_train(input_mol=input_mol, target_mol=target_mol, pssm=pssm,
+                                        predicted_ss=predicted_ss, predicted_acc20=predicted_acc20,
+                                        buffer=buffer, width=width)
     return occus, input_mol.select('name CA').getResnames(), input_mol.select('name CA').getResnums()
 
 
@@ -143,8 +146,9 @@ def get_voxel_predict(input_path, fasta_path, pssm_path, ss_path, acc20_path, bu
     pssm = get_pssm(pssm_path)
     predicted_ss = get_predicted_ss(ss_path)
     predicted_acc20 = get_predicted_acc20(acc20_path)
-    occus,input_mol = make_voxel_predict(input_mol=input_mol, fasta_path=fasta_path, pssm=pssm,
-                                predicted_ss=predicted_ss, predicted_acc20=predicted_acc20, buffer=buffer, width=width)
+    occus, input_mol = make_voxel_predict(input_mol=input_mol, fasta_path=fasta_path, pssm=pssm,
+                                          predicted_ss=predicted_ss, predicted_acc20=predicted_acc20,
+                                          buffer=buffer, width=width)
     return occus, input_mol.select('name CA').getResnames(), input_mol.select('name CA').getResnums()
 
 
@@ -154,7 +158,6 @@ def make_voxel_predict_atom_only(input_mol, buffer, width):
         'name C').getCoords(), input_mol.select('name N').getCoords()
     channel = get_atom_type_array(res_name=input_mol.getResnames(), atom_name=input_mol.getNames())
     residue_info_dummy = np.zeros((len(input_mol), 24))
-    print(channel.shape, residue_info_dummy.shape)
     channel = np.append(channel, residue_info_dummy, axis=1)
     output = []
     for ca_coord, c_coord, n_coord in zip(CA_list, C_list, N_list):
@@ -162,7 +165,7 @@ def make_voxel_predict_atom_only(input_mol, buffer, width):
         atom = atom_coord - ca_coord
         occus = calc_occupancy_bool(atom_coord=atom, channel=channel, buffer=buffer, width=width, axis=axis)
         output.append(occus)
-    output = np.array(output, dtype=np.float32)[:, :14, :, :, :] # use only atom-type features
+    output = np.array(output, dtype=np.float32)[:, :14, :, :, :]  # use only atom-type features
     return output, input_mol
 
 
@@ -219,6 +222,7 @@ def get_predicted_acc20(file_path):
         rsa = np.reshape(rsa, [rsa.shape[0], 1])
         return rsa/100
 
+
 def get_predicted_ss(file_path):
     ss_dict = {'H': 0, 'G': 0, 'I': 0, 'E': 1, 'B': 1, 'b': 1, 'T': 2, 'C': 2}
     with open(file_path, 'r') as f:
@@ -226,6 +230,7 @@ def get_predicted_ss(file_path):
         ss = np.array([ss_dict[i] for i in lines], dtype=np.int32)
         ss = np.identity(3, dtype=np.bool)[ss]
         return ss
+
 
 def align_by_resid(input_mol, target_mol):
     target_resid, input_resid = target_mol.select('calpha').getResnums(), input_mol.select('calpha').getResnums()
@@ -237,4 +242,3 @@ def align_by_resid(input_mol, target_mol):
         return None, None, None
     aligned_input_mol = input_mol.select('resindex ' + reduce(lambda a, b: str(a) + ' ' + str(b), aligned_input_index))
     return aligned_input_mol, aligned_target_index, aligned_input_index
-
