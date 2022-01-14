@@ -148,6 +148,31 @@ def get_voxel_predict(input_path, fasta_path, pssm_path, ss_path, acc20_path, bu
     return occus, input_mol.select('name CA').getResnames(), input_mol.select('name CA').getResnums()
 
 
+def make_voxel_predict_atom_only(input_mol, buffer, width):
+    atom_coord = input_mol.getCoords()
+    CA_list, C_list, N_list = input_mol.select('name CA').getCoords(), input_mol.select(
+        'name C').getCoords(), input_mol.select('name N').getCoords()
+    channel = get_atom_type_array(res_name=input_mol.getResnames(), atom_name=input_mol.getNames())
+    residue_info_dummy = np.zeros((len(input_mol), 24))
+    print(channel.shape, residue_info_dummy.shape)
+    channel = np.append(channel, residue_info_dummy, axis=1)
+    output = []
+    for ca_coord, c_coord, n_coord in zip(CA_list, C_list, N_list):
+        axis = get_axis(CA_coord=ca_coord, N_coord=n_coord, C_coord=c_coord)
+        atom = atom_coord - ca_coord
+        occus = calc_occupancy_bool(atom_coord=atom, channel=channel, buffer=buffer, width=width, axis=axis)
+        output.append(occus)
+    output = np.array(output, dtype=np.float32)[:, :14, :, :, :] # use only atom-type features
+    return output, input_mol
+
+
+def get_voxel_predict_atom_only(input_path, buffer, width):
+    input_mol = parse_input_file(input_path)
+    input_mol = input_mol.select('element C or element N or element O or element S')
+    occus, input_mol = make_voxel_predict_atom_only(input_mol=input_mol, buffer=buffer, width=width)
+    return occus, input_mol.select('name CA').getResnames(), input_mol.select('name CA').getResnums()
+
+
 def parse_mmCIF(input_path: str):
     try:
         input_mol = parseMMCIF(input_path)
