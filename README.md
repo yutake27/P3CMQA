@@ -111,6 +111,8 @@ Therefore, the preprocessing part should be installed regardless of whether you 
     LICENSE  README.md  data  result  src  trained_model.npz
     ```
 
+    We also provide the pre-trained model that use only atom-type features at [here](http://www.cb.cs.titech.ac.jp/p3cmqa/trained_model_atom_only.npz).
+
 6. [Scwrl4](http://dunbrack.fccc.edu/SCWRL3.php/#installation) (to optimize sidechain) **Not essential, but optional**
 
     Please export PATH to SCWRL4 to use `Scwrl4`
